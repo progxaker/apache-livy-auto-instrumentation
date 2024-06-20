@@ -1,0 +1,29 @@
+version: '3'
+services:
+  jaeger:
+    image: jaegertracing/all-in-one:${JAEGER_VERSION:-latest}
+    command: ["--query.max-clock-skew-adjustment", "500ms"]
+    ports:
+      - "16686:16686"
+      - "4318:4318"
+    environment:
+      - LOG_LEVEL=info
+
+  spark:
+    image: auto-instrument-spark
+    build: .
+    environment:
+      JAVA_TOOL_OPTIONS: '-javaagent:/tmp/opentelemetry-javaagent.jar'
+      #JAVA_TOOL_OPTIONS: '-javaagent:/tmp/applicationinsights-agent.jar'
+      OTEL_EXPORTER_OTLP_ENDPOINT: 'http://jaeger:4318'
+      OTEL_SERVICE_NAME: 'spark-app'
+      OTEL_METRICS_EXPORTER: 'none'
+      OTEL_LOGS_EXPORTER: 'none'
+      CLASSPATH: '/tmp/spark/jars/'
+    #secrets:
+    #  - applicationinsights_connection_string
+    command: ["/tmp/spark/bin/spark-submit", "--class", "SimpleApp", "--master", "local[4]", "--conf", "spark.jars.ivy=/tmp/.ivy", "target/simple-project-1.0.jar"]
+
+#secrets:
+  #applicationinsights_connection_string:
+    #file: ./applicationinsights-connection-string.txt

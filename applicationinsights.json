@@ -1,0 +1,3 @@
+{
+  "connectionString": "${file:/run/secrets/applicationinsights_connection_string}"
+}
