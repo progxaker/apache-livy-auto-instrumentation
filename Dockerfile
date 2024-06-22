@@ -16,7 +16,7 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS spark-app
 
 WORKDIR /tmp/project/
 
-COPY SimpleApp.java ./src/main/java/SimpleApp.java
+COPY src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java ./src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java
 COPY pom.xml ./pom.xml
 
 RUN mvn package
@@ -60,9 +60,9 @@ COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/si
 COPY --from=livy-builder /tmp/incubator-livy/ /tmp/incubator-livy/
 COPY --from=agents /tmp/opentelemetry-javaagent-2.5.0.jar /tmp/opentelemetry-javaagent.jar
 COPY --from=agents /tmp/applicationinsights-agent-3.5.3.jar /tmp/applicationinsights-agent.jar
-COPY applicationinsights.json /tmp/applicationinsights.json
-COPY spark-defaults.conf /tmp/spark/conf/spark-defaults.conf
-COPY livy.conf /tmp/incubator-livy/conf/livy.conf
+COPY conf/applicationinsights.json /tmp/applicationinsights.json
+COPY conf/spark-defaults.conf /tmp/spark/conf/spark-defaults.conf
+COPY conf/livy.conf /tmp/incubator-livy/conf/livy.conf
 
 WORKDIR /tmp/incubator-livy/
 

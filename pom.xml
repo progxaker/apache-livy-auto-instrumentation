@@ -1,5 +1,5 @@
 <project>
-  <groupId>edu.berkeley</groupId>
+  <groupId>com.gitlab.progxaker.sparkapplication</groupId>
   <artifactId>simple-project</artifactId>
   <modelVersion>4.0.0</modelVersion>
   <name>Simple Project</name>

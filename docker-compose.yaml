@@ -26,4 +26,4 @@ services:
 
 #secrets:
   #applicationinsights_connection_string:
-    #file: ./applicationinsights-connection-string.txt
+    #file: ./conf/applicationinsights-connection-string.txt
