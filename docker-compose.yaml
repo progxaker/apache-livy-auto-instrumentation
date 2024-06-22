@@ -4,13 +4,12 @@ services:
     image: jaegertracing/all-in-one:${JAEGER_VERSION:-latest}
     command: ["--query.max-clock-skew-adjustment", "500ms"]
     ports:
-      - "16686:16686"
-      - "4318:4318"
+      - "127.0.0.1:16686:16686"
     environment:
       - LOG_LEVEL=info
 
-  spark:
-    image: auto-instrument-spark
+  livy:
+    image: livy-image
     build: .
     environment:
       JAVA_TOOL_OPTIONS: '-javaagent:/tmp/opentelemetry-javaagent.jar'
@@ -19,10 +18,11 @@ services:
       OTEL_SERVICE_NAME: 'spark-app'
       OTEL_METRICS_EXPORTER: 'none'
       OTEL_LOGS_EXPORTER: 'none'
-      CLASSPATH: '/tmp/spark/jars/'
     #secrets:
     #  - applicationinsights_connection_string
-    command: ["/tmp/spark/bin/spark-submit", "--class", "SimpleApp", "--master", "local[4]", "--conf", "spark.jars.ivy=/tmp/.ivy", "target/simple-project-1.0.jar"]
+    command: ["/tmp/incubator-livy/bin/livy-server"]
+    ports:
+      - "127.0.0.1:8998:8998"
 
 #secrets:
   #applicationinsights_connection_string:
