@@ -51,15 +51,18 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234
 USER 0
 
 RUN microdnf install -y procps
+RUN groupadd --gid 1000 livy && useradd --uid 1000 --gid livy --shell /bin/bash --home-dir /tmp/incubator-livy livy
 
 USER 1000
 
 COPY --from=spark /tmp/spark/ /tmp/spark/
-COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/simple-project.1.0.jar
+COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/simple-project-1.0.jar
 COPY --from=livy-builder /tmp/incubator-livy/ /tmp/incubator-livy/
 COPY --from=agents /tmp/opentelemetry-javaagent-2.5.0.jar /tmp/opentelemetry-javaagent.jar
 COPY --from=agents /tmp/applicationinsights-agent-3.5.3.jar /tmp/applicationinsights-agent.jar
 COPY applicationinsights.json /tmp/applicationinsights.json
+COPY spark-defaults.conf /tmp/spark/conf/spark-defaults.conf
+COPY livy.conf /tmp/incubator-livy/conf/livy.conf
 
 WORKDIR /tmp/incubator-livy/
 
