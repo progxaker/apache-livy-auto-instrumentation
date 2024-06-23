@@ -12,10 +12,10 @@ services:
     image: livy-image
     build: .
     environment:
-      JAVA_TOOL_OPTIONS: '-javaagent:/tmp/opentelemetry-javaagent.jar'
+      JAVA_TOOL_OPTIONS: '-javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.javaagent.extensions=/tmp/otel-livy-extension-0.8.jar'
       #JAVA_TOOL_OPTIONS: '-javaagent:/tmp/applicationinsights-agent.jar'
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://jaeger:4318'
-      OTEL_SERVICE_NAME: 'spark-app'
+      OTEL_SERVICE_NAME: 'livy-app'
       OTEL_METRICS_EXPORTER: 'none'
       OTEL_LOGS_EXPORTER: 'none'
     #secrets:

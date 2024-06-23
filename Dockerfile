@@ -17,7 +17,7 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS spark-app
 WORKDIR /tmp/project/
 
 COPY src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java ./src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java
-COPY pom.xml ./pom.xml
+COPY pom-spark.xml ./pom.xml
 
 RUN mvn package
 
@@ -46,6 +46,15 @@ WORKDIR /tmp/incubator-livy
 RUN git checkout 78b512658e4baf1183f2b352203ada1928d8111a
 RUN mvn package -DskipTests -DskipITs -Dmaven.javadoc.skip=true
 
+FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS otel-extension
+
+WORKDIR /tmp/project
+
+COPY src/main/java/com/gitlab/progxaker/otelextension/ ./src/main/java/com/gitlab/progxaker/otelextension/
+COPY pom-extension.xml ./pom.xml
+
+RUN mvn package
+
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234
 
 USER 0
@@ -58,6 +67,7 @@ USER 1000
 COPY --from=spark /tmp/spark/ /tmp/spark/
 COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/simple-project-1.0.jar
 COPY --from=livy-builder /tmp/incubator-livy/ /tmp/incubator-livy/
+COPY --from=otel-extension /tmp/project/target/otel-livy-extension-0.8.jar /tmp/otel-livy-extension-0.8.jar
 COPY --from=agents /tmp/opentelemetry-javaagent-2.5.0.jar /tmp/opentelemetry-javaagent.jar
 COPY --from=agents /tmp/applicationinsights-agent-3.5.3.jar /tmp/applicationinsights-agent.jar
 COPY conf/applicationinsights.json /tmp/applicationinsights.json
