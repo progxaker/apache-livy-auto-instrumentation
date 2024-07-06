@@ -39,7 +39,7 @@ public class BatchSessionServletInstrumentation implements TypeInstrumentation {
             // TODO: Use Instrumenter.builder()
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
 
-            span = tracer.spanBuilder("BatchSession-init").startSpan();
+            span = tracer.spanBuilder("Create a batch session").startSpan();
             scope = span.makeCurrent();
 
             return scope;
