@@ -28,6 +28,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
           "org.apache.livy.server.batch.BatchSessionServlet",
           "org.apache.livy.Utils",
           "org.apache.livy.utils.SparkApp",
+          "org.apache.livy.utils.SparkProcApp",
           "org.apache.livy.utils.SparkProcessBuilder");
     }
 
@@ -38,6 +39,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
           new BatchSessionServletInstrumentation(),
           new UtilsInstrumentation(),
           new SparkAppInstrumentation(),
+          new SparkProcAppInstrumentation(),
           new SparkProcessBuilderInstrumentation());
     }
 }
