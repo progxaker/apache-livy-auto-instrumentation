@@ -34,11 +34,12 @@ public class UtilsInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class MethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Local("otelSpan") Span span,
+        public static Scope onEnter(@Advice.Argument(0) String threadName,
+                                    @Advice.Local("otelSpan") Span span,
                                     @Advice.Local("otelScope") Scope scope) {
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
 
-            span = tracer.spanBuilder("startDaemonThread").startSpan();
+            span = tracer.spanBuilder("startDaemonThread - " + threadName).startSpan();
             scope = span.makeCurrent();
 
             return scope;
