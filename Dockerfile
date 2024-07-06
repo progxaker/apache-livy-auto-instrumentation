@@ -16,9 +16,10 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS spark-app
 
 WORKDIR /tmp/project/
 
-COPY src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java ./src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java
 COPY pom-spark.xml ./pom.xml
+RUN mvn dependency:go-offline
 
+COPY src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java ./src/main/java/com/gitlab/progxaker/sparkapplication/SimpleApp.java
 RUN mvn package
 
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS agents
@@ -50,9 +51,10 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS otel-extens
 
 WORKDIR /tmp/project
 
-COPY src/main/java/com/gitlab/progxaker/otelextension/ ./src/main/java/com/gitlab/progxaker/otelextension/
 COPY pom-extension.xml ./pom.xml
+RUN mvn dependency:go-offline
 
+COPY src/main/java/com/gitlab/progxaker/otelextension/ ./src/main/java/com/gitlab/progxaker/otelextension/
 RUN mvn package
 
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234
