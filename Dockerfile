@@ -35,7 +35,7 @@ USER 0
 
 WORKDIR /tmp/
 
-RUN microdnf install -y git python3.11 krb5-libs krb5-workstation
+RUN microdnf install -y git python3.11
 RUN update-alternatives --set python /usr/bin/python3 && python -m ensurepip --upgrade && python -m pip install --upgrade pip
 RUN pip3 install setuptools cloudpickle requests flake8 flaky pytest
 
