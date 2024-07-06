@@ -23,6 +23,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
 
     public List<String> getAdditionalHelperClassNames() {
       return asList(
+          "com.gitlab.progxaker.otelextension.BatchSessionViewTransfomer",
           "com.gitlab.progxaker.otelextension.SpanContextStorage");
     }
 
@@ -31,6 +32,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
       return hasClassesNamed(
           "org.apache.livy.server.batch.BatchSession",
           "org.apache.livy.server.batch.BatchSessionServlet",
+          "org.apache.livy.server.SessionServlet",
           "org.apache.livy.Utils",
           "org.apache.livy.utils.SparkApp",
           "org.apache.livy.utils.SparkProcApp",
@@ -42,6 +44,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
       return asList(
           new BatchSessionInstrumentation(),
           new BatchSessionServletInstrumentation(),
+          new BatchSessionViewInstrumentation(),
           new UtilsInstrumentation(),
           new SparkAppInstrumentation(),
           new SparkProcAppInstrumentation(),
