@@ -33,19 +33,14 @@ FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS livy-builde
 
 USER 0
 
-WORKDIR /tmp/
-
-RUN microdnf install -y git python3.11
-RUN update-alternatives --set python /usr/bin/python3 && python -m ensurepip --upgrade && python -m pip install --upgrade pip
-RUN pip3 install setuptools cloudpickle requests flake8 flaky pytest
+RUN microdnf install -y unzip
 
 USER 1000
 
-RUN git clone https://github.com/apache/incubator-livy.git
+WORKDIR /tmp
 
-WORKDIR /tmp/incubator-livy
-RUN git checkout 78b512658e4baf1183f2b352203ada1928d8111a
-RUN mvn package -DskipTests -DskipITs -Dmaven.javadoc.skip=true
+RUN curl -fsSLo apache-livy-0.8.0-incubating_2.12-bin.zip https://dlcdn.apache.org/incubator/livy/0.8.0-incubating/apache-livy-0.8.0-incubating_2.12-bin.zip && \
+    unzip apache-livy-0.8.0-incubating_2.12-bin.zip
 
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS otel-extension
 
@@ -68,7 +63,7 @@ USER 1000
 
 COPY --from=spark /tmp/spark/ /tmp/spark/
 COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/simple-project-1.0.jar
-COPY --from=livy-builder /tmp/incubator-livy/ /tmp/incubator-livy/
+COPY --from=livy-builder /tmp/apache-livy-0.8.0-incubating_2.12-bin/ /tmp/incubator-livy/
 COPY --from=otel-extension /tmp/project/target/otel-livy-extension-0.8.jar /tmp/otel-livy-extension-0.8.jar
 COPY --from=agents /tmp/opentelemetry-javaagent-2.5.0.jar /tmp/opentelemetry-javaagent.jar
 COPY --from=agents /tmp/applicationinsights-agent-3.5.3.jar /tmp/applicationinsights-agent.jar
