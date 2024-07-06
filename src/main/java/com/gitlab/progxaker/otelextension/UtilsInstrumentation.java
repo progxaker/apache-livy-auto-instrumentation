@@ -5,10 +5,8 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
 import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
-import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
-import io.opentelemetry.context.Scope;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
 import net.bytebuddy.asm.Advice;
@@ -34,26 +32,15 @@ public class UtilsInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class MethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Argument(0) String threadName,
-                                    @Advice.Local("otelSpan") Span span,
-                                    @Advice.Local("otelScope") Scope scope) {
-            Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
+        public static void onEnter(@Advice.Argument(0) String threadName) {
 
-            span = tracer.spanBuilder("startDaemonThread - " + threadName).startSpan();
-            scope = span.makeCurrent();
-
-            return scope;
-        }
-
-        @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
-        public static void onExit(@Advice.Local("otelSpan") Span span,
-                                  @Advice.Local("otelScope") Scope scope,
-                                  @Advice.Thrown Throwable exception) {
-          if (scope == null) {
-            return;
-          }
-          scope.close();
-          span.end();
+            /*
+                Store SpanContext in ConcurrentHashMap to link the SparProcApp thread
+                to the current trace (currently the SparkAppInstrumentation class).
+            */
+            if (threadName.startsWith("SparProcApp_")) {
+                SpanContextStorage.set(threadName, Span.current().getSpanContext());
+            }
         }
     }
 }

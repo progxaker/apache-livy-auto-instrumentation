@@ -21,6 +21,11 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
       return className.startsWith("com.gitlab.progxaker.otelextension");
     }
 
+    public List<String> getAdditionalHelperClassNames() {
+      return asList(
+          "com.gitlab.progxaker.otelextension.SpanContextStorage");
+    }
+
     @Override
     public ElementMatcher.Junction<ClassLoader> classLoaderMatcher() {
       return hasClassesNamed(

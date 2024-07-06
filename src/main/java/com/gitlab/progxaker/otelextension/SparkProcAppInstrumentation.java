@@ -4,6 +4,8 @@ import static net.bytebuddy.matcher.ElementMatchers.named;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.SpanBuilder;
+import io.opentelemetry.api.trace.SpanContext;
 import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
@@ -37,8 +39,18 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
         public static Scope onEnter(@Advice.Local("otelSpan") Span span,
                                    @Advice.Local("otelScope") Scope scope) {
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
+            SpanBuilder spanBuilder = tracer.spanBuilder("Run a Spark application");
 
-            span = tracer.spanBuilder("Run a Spark application").startSpan();
+            String threadName = Thread.currentThread().getName();
+            if (threadName.startsWith("SparProcApp_")) {
+                SpanContext livyAppContext = SpanContextStorage.get(threadName);
+                if (livyAppContext != null) {
+                    spanBuilder.addLink(livyAppContext);
+                    SpanContextStorage.remove(threadName);
+                }
+            }
+
+            span = spanBuilder.startSpan();
             scope = span.makeCurrent();
 
             return scope;
