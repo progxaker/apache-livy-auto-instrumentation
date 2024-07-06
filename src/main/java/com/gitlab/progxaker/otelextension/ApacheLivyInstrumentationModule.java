@@ -25,6 +25,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
     public ElementMatcher.Junction<ClassLoader> classLoaderMatcher() {
       return hasClassesNamed(
           "org.apache.livy.Utils",
+          "org.apache.livy.server.batch.BatchSession",
           "org.apache.livy.server.batch.BatchSessionServlet");
     }
 
@@ -32,6 +33,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
     public List<TypeInstrumentation> typeInstrumentations() {
       return asList(
           new UtilsInstrumentation(),
+          new BatchSessionInstrumentation(),
           new BatchSessionServletInstrumentation());
     }
 }
