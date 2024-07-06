@@ -8,9 +8,8 @@ RUN microdnf install -y gzip
 
 USER 1000
 
-RUN curl -fsSLo /tmp/spark.tgz https://archive.apache.org/dist/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz
-RUN tar -C /tmp/ -xzf spark.tgz
-RUN mv /tmp/spark-3.5.1-bin-hadoop3 /tmp/spark/
+RUN curl -fsSLo /tmp/spark.tgz https://archive.apache.org/dist/spark/spark-3.5.1/spark-3.5.1-bin-hadoop3.tgz && \
+    tar -C /tmp/ -xzf spark.tgz
 
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS spark-app
 
@@ -39,8 +38,8 @@ USER 1000
 
 WORKDIR /tmp
 
-RUN curl -fsSLo apache-livy-0.8.0-incubating_2.12-bin.zip https://dlcdn.apache.org/incubator/livy/0.8.0-incubating/apache-livy-0.8.0-incubating_2.12-bin.zip && \
-    unzip apache-livy-0.8.0-incubating_2.12-bin.zip
+RUN curl -fsSLo apache-livy.zip https://dlcdn.apache.org/incubator/livy/0.8.0-incubating/apache-livy-0.8.0-incubating_2.12-bin.zip && \
+    unzip apache-livy.zip
 
 FROM registry.access.redhat.com/ubi8/openjdk-17:1.18-2.1705573234 AS otel-extension
 
@@ -61,7 +60,7 @@ RUN groupadd --gid 1000 livy && useradd --uid 1000 --gid livy --shell /bin/bash 
 
 USER 1000
 
-COPY --from=spark /tmp/spark/ /tmp/spark/
+COPY --from=spark /tmp/spark-3.5.1-bin-hadoop3/ /tmp/spark/
 COPY --from=spark-app /tmp/project/target/simple-project-1.0.jar /tmp/project/simple-project-1.0.jar
 COPY --from=livy-builder /tmp/apache-livy-0.8.0-incubating_2.12-bin/ /tmp/incubator-livy/
 COPY --from=otel-extension /tmp/project/target/otel-livy-extension-0.8.jar /tmp/otel-livy-extension-0.8.jar
