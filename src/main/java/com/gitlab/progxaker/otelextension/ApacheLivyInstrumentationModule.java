@@ -24,16 +24,18 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
     @Override
     public ElementMatcher.Junction<ClassLoader> classLoaderMatcher() {
       return hasClassesNamed(
-          "org.apache.livy.Utils",
           "org.apache.livy.server.batch.BatchSession",
-          "org.apache.livy.server.batch.BatchSessionServlet");
+          "org.apache.livy.server.batch.BatchSessionServlet",
+          "org.apache.livy.Utils",
+          "org.apache.livy.utils.SparkProcessBuilder");
     }
 
     @Override
     public List<TypeInstrumentation> typeInstrumentations() {
       return asList(
-          new UtilsInstrumentation(),
           new BatchSessionInstrumentation(),
-          new BatchSessionServletInstrumentation());
+          new BatchSessionServletInstrumentation(),
+          new UtilsInstrumentation(),
+          new SparkProcessBuilderInstrumentation());
     }
 }
