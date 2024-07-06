@@ -1,7 +1,7 @@
 package com.gitlab.progxaker.otelextension;
 
 import static io.opentelemetry.javaagent.extension.matcher.AgentElementMatchers.hasClassesNamed;
-import static java.util.Collections.singletonList;
+import static java.util.Arrays.asList;
 
 import com.google.auto.service.AutoService;
 import io.opentelemetry.javaagent.extension.instrumentation.InstrumentationModule;
@@ -23,11 +23,15 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
 
     @Override
     public ElementMatcher.Junction<ClassLoader> classLoaderMatcher() {
-      return hasClassesNamed("org.apache.livy.server.batch.BatchSessionServlet");
+      return hasClassesNamed(
+          "org.apache.livy.Utils",
+          "org.apache.livy.server.batch.BatchSessionServlet");
     }
 
     @Override
     public List<TypeInstrumentation> typeInstrumentations() {
-      return singletonList(new BatchSessionServletInstrumentation());
+      return asList(
+          new UtilsInstrumentation(),
+          new BatchSessionServletInstrumentation());
     }
 }
