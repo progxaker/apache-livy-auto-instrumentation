@@ -17,7 +17,8 @@ import net.bytebuddy.matcher.ElementMatcher;
 public class BatchSessionInstrumentation implements TypeInstrumentation {
     @Override
     public ElementMatcher<TypeDescription> typeMatcher() {
-        return named("org.apache.livy.server.batch.BatchSession");
+        return named("org.apache.livy.server.batch.BatchSession")
+                   .or(named("org.apache.livy.server.batch.BatchSession$"));
     }
 
     @Override
@@ -26,11 +27,17 @@ public class BatchSessionInstrumentation implements TypeInstrumentation {
           isMethod()
             .and(takesArguments(0))
             .and(named("start")),
-          this.getClass().getName() + "$MethodAdvice");
+          this.getClass().getName() + "$ClassStartMethodAdvice");
+
+        transformer.applyAdviceToMethod(
+          isMethod()
+            .and(takesArguments(9))
+            .and(named("create")),
+          this.getClass().getName() + "$ObjectCreateMethodAdvice");
     }
 
     @SuppressWarnings("unused")
-    public static class MethodAdvice {
+    public static class ClassStartMethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
         public static void onEnter(@Advice.Local("otelSpan") Span span,
                                    @Advice.Local("otelScope") Scope scope) {
@@ -49,6 +56,16 @@ public class BatchSessionInstrumentation implements TypeInstrumentation {
           }
           scope.close();
           span.end();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ObjectCreateMethodAdvice {
+        @Advice.OnMethodEnter(suppress = Throwable.class)
+        public static void onEnter(@Advice.Argument(2) Object request,
+                                   @Advice.Local("otelSpan") Span span,
+                                   @Advice.Local("otelScope") Scope scope) {
+            Span.current().setAttribute("http.request.body.content", request.toString());
         }
     }
 }
