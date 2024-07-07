@@ -47,7 +47,7 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class AnonFunctionAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Local("otelSpan") Span span,
+        public static void onEnter(@Advice.Local("otelSpan") Span span,
                                    @Advice.Local("otelScope") Scope scope) {
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
             SpanBuilder spanBuilder = tracer.spanBuilder("Run a Spark application");
@@ -63,8 +63,6 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
 
             span = spanBuilder.startSpan();
             scope = span.makeCurrent();
-
-            return scope;
         }
 
         @Advice.OnMethodExit(onThrowable = Throwable.class, suppress = Throwable.class)

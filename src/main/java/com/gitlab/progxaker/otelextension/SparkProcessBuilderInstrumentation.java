@@ -32,14 +32,12 @@ public class SparkProcessBuilderInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class MethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Local("otelSpan") Span span,
-                                    @Advice.Local("otelScope") Scope scope) {
+        public static void onEnter(@Advice.Local("otelSpan") Span span,
+                                   @Advice.Local("otelScope") Scope scope) {
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
 
             span = tracer.spanBuilder("Build a Spark process").startSpan();
             scope = span.makeCurrent();
-
-            return scope;
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)

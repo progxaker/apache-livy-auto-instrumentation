@@ -34,15 +34,13 @@ public class BatchSessionServletInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class MethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Local("otelSpan") Span span,
-                                    @Advice.Local("otelScope") Scope scope) {
+        public static void onEnter(@Advice.Local("otelSpan") Span span,
+                                   @Advice.Local("otelScope") Scope scope) {
             // TODO: Use Instrumenter.builder()
             Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
 
             span = tracer.spanBuilder("Create a batch session").startSpan();
             scope = span.makeCurrent();
-
-            return scope;
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)

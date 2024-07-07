@@ -39,9 +39,9 @@ public class BatchSessionViewInstrumentation implements TypeInstrumentation {
     @SuppressWarnings("unused")
     public static class MethodAdvice {
         @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static Scope onEnter(@Advice.Argument(0) Object body,
-                                    @Advice.Local("otelSpan") Span span,
-                                    @Advice.Local("otelScope") Scope scope) {
+        public static void onEnter(@Advice.Argument(0) Object body,
+                                   @Advice.Local("otelSpan") Span span,
+                                   @Advice.Local("otelScope") Scope scope) {
             if (BatchSessionViewTransfomer.isBatchSessionView(body)) {
                 Tracer tracer = GlobalOpenTelemetry.getTracer("apache-livy", "0.8");
 
@@ -50,8 +50,6 @@ public class BatchSessionViewInstrumentation implements TypeInstrumentation {
 
                 scope = span.makeCurrent();
             }
-
-            return scope;
         }
 
         @Advice.OnMethodExit(suppress = Throwable.class, onThrowable = Throwable.class)
