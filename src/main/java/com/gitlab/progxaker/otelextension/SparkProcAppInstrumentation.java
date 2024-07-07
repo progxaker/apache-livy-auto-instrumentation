@@ -1,6 +1,9 @@
 package com.gitlab.progxaker.otelextension;
 
+import static net.bytebuddy.matcher.ElementMatchers.isMethod;
 import static net.bytebuddy.matcher.ElementMatchers.named;
+import static net.bytebuddy.matcher.ElementMatchers.takesArgument;
+import static net.bytebuddy.matcher.ElementMatchers.takesArguments;
 
 import io.opentelemetry.api.GlobalOpenTelemetry;
 import io.opentelemetry.api.trace.Span;
@@ -31,6 +34,14 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
         transformer.applyAdviceToMethod(
             named("$anonfun$waitThread$1"),
             this.getClass().getName() + "$AnonFunctionAdvice");
+
+        // Scala "org.apache.livy.utils.SparkApp$State$Value" translates to Java "scala.Enumeration$Value"
+        transformer.applyAdviceToMethod(
+            isMethod()
+              .and(takesArguments(1))
+              .and(takesArgument(0, named("scala.Enumeration$Value")))
+              .and(named("changeState")),
+            this.getClass().getName() + "$ChangeStateAdvice");
     }
 
     @SuppressWarnings("unused")
@@ -65,6 +76,28 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
             }
             scope.close();
             span.end();
+        }
+    }
+
+    @SuppressWarnings("unused")
+    public static class ChangeStateAdvice {
+        @Advice.OnMethodExit(suppress = Throwable.class)
+        public static void onExit(@Advice.FieldValue("state") Object finalState,
+                                  @Advice.Argument(0) Object specifiedState) {
+            /*
+                TODO: Use ConcurrentHashMap to set the state attribute only for the root span
+                ---
+                The function compares the final value (i.e. the state that was set
+                by the changeState function) with the input argument. If they match,
+                it means that the function has set a new value, so it's necessary
+                to set it in the state attribute.
+            */
+            if (finalState == specifiedState) {
+                Span span = Span.current();
+                if (span != null) {
+                    span.setAttribute("state", specifiedState.toString().toLowerCase());
+                }
+            }
         }
     }
 }

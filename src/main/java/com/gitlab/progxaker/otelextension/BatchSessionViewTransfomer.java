@@ -20,7 +20,7 @@ public class BatchSessionViewTransfomer {
             span.setAttribute("name", getOptionValue(batchSessionView.name()));
             span.setAttribute("owner", batchSessionView.owner());
             span.setAttribute("proxyUser", getOptionValue(batchSessionView.proxyUser()));
-            span.setAttribute("state", batchSessionView.state());
+            span.setAttribute("state", batchSessionView.state().toLowerCase());
             span.setAttribute("appId", getOptionValue(batchSessionView.appId()));
             setAppInfoAttributes(span, batchSessionView.appInfo().asJavaMap());
 
