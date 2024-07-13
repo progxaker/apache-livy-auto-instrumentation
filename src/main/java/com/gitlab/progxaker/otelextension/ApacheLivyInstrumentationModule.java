@@ -34,6 +34,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
           "org.apache.livy.server.batch.BatchSessionServlet",
           "org.apache.livy.server.SessionServlet",
           "org.apache.livy.Utils",
+          "org.apache.livy.utils.LineBufferedProcess",
           "org.apache.livy.utils.SparkApp",
           "org.apache.livy.utils.SparkProcApp",
           "org.apache.livy.utils.SparkProcessBuilder");
@@ -46,6 +47,7 @@ public class ApacheLivyInstrumentationModule extends InstrumentationModule {
           new BatchSessionServletInstrumentation(),
           new BatchSessionViewInstrumentation(),
           new UtilsInstrumentation(),
+          new LineBufferedProcessInstrumentation(),
           new SparkAppInstrumentation(),
           new SparkProcAppInstrumentation(),
           new SparkProcessBuilderInstrumentation());
