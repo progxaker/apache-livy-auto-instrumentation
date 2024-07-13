@@ -39,11 +39,11 @@ POST /batches/*
 There is currently no separate flow for only building the extension jar file,
 but you can try doing the following:
 
-1. Remove the source code of the Spark application:
+1. Remove the source code of the Spark application:  
    `rm -rf src/main/java/com/gitlab/progxaker/sparkapplication/`.
-2. Rename the `pom-extension.xml` file to `pom.xml` to use in the future for `mvn`:
+2. Rename the `pom-extension.xml` file to `pom.xml` to use in the future for `mvn`:  
    `mv pom-extension.xml pom.xml`.
-3. Package the source code:
+3. Package the source code:  
    `mvn package`.
 4. The result file will be stored in `target/otel-livy-extension-0.8.jar`.
 
@@ -51,10 +51,10 @@ but you can try doing the following:
 
 To build and run the example application, follow these steps:
 
-1. Build the Docker images and run them using Docker Compose:
-   `docker-compose up --build --detach`
-2. Send a request using `create-batch.sh`:
-   `bash create-batch.sh`
+1. Build the Docker images and run them using Docker Compose:  
+   `docker-compose up --build --detach`.
+2. Send a request using `create-batch.sh`:  
+   `bash create-batch.sh`.
 3. Go to Jaeger (http://127.0.0.1:16686/).
 4. Select the livy-app service.
 5. Click "Find Traces".
