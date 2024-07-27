@@ -12,7 +12,7 @@ services:
     build: .
     environment:
       JAVA_TOOL_OPTIONS: '-javaagent:/tmp/opentelemetry-javaagent.jar -Dotel.javaagent.extensions=/tmp/otel-livy-extension-0.8.jar'
-      #JAVA_TOOL_OPTIONS: '-javaagent:/tmp/applicationinsights-agent.jar'
+      #JAVA_TOOL_OPTIONS: '-javaagent:/tmp/applicationinsights-agent.jar -Dotel.javaagent.extensions=/tmp/otel-livy-extension-0.8.jar -Dotel.instrumentation.apache-livy.enabled=true'
       OTEL_EXPORTER_OTLP_ENDPOINT: 'http://jaeger:4318'
       OTEL_SERVICE_NAME: 'livy-app'
       OTEL_METRICS_EXPORTER: 'none'
