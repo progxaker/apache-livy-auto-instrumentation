@@ -13,27 +13,25 @@ import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
 
 public class LineBufferedProcessInstrumentation implements TypeInstrumentation {
-    @Override
-    public ElementMatcher<TypeDescription> typeMatcher() {
-        return named("org.apache.livy.utils.LineBufferedProcess");
-    }
+  @Override
+  public ElementMatcher<TypeDescription> typeMatcher() {
+    return named("org.apache.livy.utils.LineBufferedProcess");
+  }
 
-    @Override
-    public void transform(TypeTransformer transformer) {
-        transformer.applyAdviceToMethod(
-          isConstructor()
-            .and(takesArguments(2)),
-          this.getClass().getName() + "$ConstructorAdvice");
-    }
+  @Override
+  public void transform(TypeTransformer transformer) {
+    transformer.applyAdviceToMethod(
+        isConstructor().and(takesArguments(2)), this.getClass().getName() + "$ConstructorAdvice");
+  }
 
-    @SuppressWarnings("unused")
-    public static class ConstructorAdvice {
-        @Advice.OnMethodEnter(suppress = Throwable.class)
-        public static void onEnter(@Advice.Argument(0) Process process) {
-            Optional<String> commandLine = process.info().commandLine();
-            if(commandLine.isPresent()) {
-                Span.current().setAttribute("spark.submit", commandLine.get());
-            }
-        }
+  @SuppressWarnings("unused")
+  public static class ConstructorAdvice {
+    @Advice.OnMethodEnter(suppress = Throwable.class)
+    public static void onEnter(@Advice.Argument(0) Process process) {
+      Optional<String> commandLine = process.info().commandLine();
+      if (commandLine.isPresent()) {
+        Span.current().setAttribute("spark.submit", commandLine.get());
+      }
     }
+  }
 }

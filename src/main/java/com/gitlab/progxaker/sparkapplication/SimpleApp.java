@@ -1,7 +1,7 @@
 package com.gitlab.progxaker.sparkapplication;
 
-import org.apache.spark.sql.SparkSession;
 import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.SparkSession;
 
 public class SimpleApp {
   public static void main(String[] args) {
