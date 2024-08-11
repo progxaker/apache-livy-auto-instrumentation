@@ -13,6 +13,7 @@ import io.opentelemetry.api.trace.Tracer;
 import io.opentelemetry.context.Scope;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeInstrumentation;
 import io.opentelemetry.javaagent.extension.instrumentation.TypeTransformer;
+import java.util.Locale;
 import net.bytebuddy.asm.Advice;
 import net.bytebuddy.description.type.TypeDescription;
 import net.bytebuddy.matcher.ElementMatcher;
@@ -90,10 +91,10 @@ public class SparkProcAppInstrumentation implements TypeInstrumentation {
                 it means that the function has set a new value, so it's necessary
                 to set it in the state attribute.
             */
-            if (finalState == specifiedState) {
+            if (finalState.equals(specifiedState)) {
                 Span span = Span.current();
                 if (span != null) {
-                    span.setAttribute("state", specifiedState.toString().toLowerCase());
+                    span.setAttribute("state", specifiedState.toString().toLowerCase(Locale.ROOT));
                 }
             }
         }

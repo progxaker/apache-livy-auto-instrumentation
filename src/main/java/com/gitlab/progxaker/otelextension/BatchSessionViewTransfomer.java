@@ -8,8 +8,7 @@ import scala.Option;
 public class BatchSessionViewTransfomer {
 
     public static Boolean isBatchSessionView(Object object) {
-        if (object instanceof BatchSessionView) return true;
-        return false;
+        return object instanceof BatchSessionView;
     }
 
     public static void setAttributes(Span span, Object object) {
